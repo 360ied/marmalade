@@ -7,6 +7,8 @@ import (
 	"net"
 
 	"marmalade/config"
+	"marmalade/packets/inbound"
+	"marmalade/packets/outbound"
 )
 
 func main() {
@@ -46,4 +48,17 @@ func handleConnection(conn net.Conn) {
 
 	reader := bufio.NewReader(conn)
 
+	_ /* protocol version */, username, _ /* verification key */, readPlayerIdentificationErr := inbound.ReadPlayerIdentification(reader)
+	if readPlayerIdentificationErr != nil {
+		log.Printf("ERROR: Error reading player identification packet from %v, error: %v", conn.RemoteAddr().String(), readPlayerIdentificationErr)
+		return
+	}
+	log.Printf("INFO: Recieved a player identification packet from %v, they say their username is `%v`", conn.RemoteAddr().String(), username)
+
+	writer := outbound.NewAFCBW(conn, config.BufferFlushInterval)
+
+	sendServerIdentificationErr := writer.SendServerIdentification(config.ServerName, config.ServerMOTD, false)
+	if sendServerIdentificationErr != nil {
+		log.Printf("ERROR: Error sending server identification packet to %v, error: %v", conn.RemoteAddr().String(), sendServerIdentificationErr)
+	}
 }

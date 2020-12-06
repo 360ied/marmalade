@@ -1,5 +1,7 @@
 package world
 
+import "marmalade/packets/outbound"
+
 type (
 	World struct {
 		blocks *ConcurrentSlice
@@ -10,7 +12,7 @@ type (
 		Position
 		OP bool
 
-		writer *AutoFlushingConcurrentBufferedWriter
+		writer *outbound.AFCBW
 	}
 
 	Position struct {

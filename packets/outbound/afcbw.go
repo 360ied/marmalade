@@ -1,4 +1,4 @@
-package world
+package outbound
 
 import (
 	"bufio"
@@ -8,9 +8,10 @@ import (
 )
 
 type (
-	PartialPacketWriter = func(io.Writer) error
+	action = func(*bufio.Writer) error
 
-	AutoFlushingConcurrentBufferedWriter struct {
+	// Auto Flushing Concurrent Buffered Writer
+	AFCBW struct {
 		writer   *bufio.Writer
 		lock     *sync.Mutex
 		interval time.Duration
@@ -18,22 +19,22 @@ type (
 	}
 )
 
-func NewAutoFlushingConcurrentBufferedWriter(writer *bufio.Writer, interval time.Duration) *AutoFlushingConcurrentBufferedWriter {
-	w := new(AutoFlushingConcurrentBufferedWriter)
-	w.writer = writer
+func NewAFCBW(writer io.Writer, interval time.Duration) *AFCBW {
+	w := new(AFCBW)
+	w.writer = bufio.NewWriter(writer)
 	w.lock = new(sync.Mutex)
 	w.interval = interval
 	go w.autoFlush()
 	return w
 }
 
-func (w *AutoFlushingConcurrentBufferedWriter) Write(ppw ...PartialPacketWriter) error {
+func (w *AFCBW) do(actions ...action) error {
 	w.lock.Lock()
 	defer w.lock.Unlock()
 	if w.err != nil {
 		return w.err
 	}
-	for _, v := range ppw {
+	for _, v := range actions {
 		if err := v(w.writer); err != nil {
 			w.err = err
 			return err
@@ -42,7 +43,7 @@ func (w *AutoFlushingConcurrentBufferedWriter) Write(ppw ...PartialPacketWriter)
 	return nil
 }
 
-func (w AutoFlushingConcurrentBufferedWriter) autoFlush() {
+func (w AFCBW) autoFlush() {
 	for {
 		time.Sleep(w.interval)
 		func() {
