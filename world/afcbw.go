@@ -23,6 +23,7 @@ func NewAutoFlushingConcurrentBufferedWriter(writer *bufio.Writer, interval time
 	w.writer = writer
 	w.lock = new(sync.Mutex)
 	w.interval = interval
+	go w.autoFlush()
 	return w
 }
 
