@@ -6,11 +6,15 @@ type (
 	}
 
 	Player struct {
-		Username   string
-		X, Y, Z    uint16
-		Yaw, Pitch uint8
-		OP         bool
+		Username string
+		Position
+		OP bool
 
 		writer *AutoFlushingConcurrentBufferedWriter
+	}
+
+	Position struct {
+		X, Y, Z    uint16
+		Yaw, Pitch uint8
 	}
 )
