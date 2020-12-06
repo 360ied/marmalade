@@ -56,6 +56,7 @@ func handleConnection(conn net.Conn) {
 	log.Printf("INFO: Recieved a player identification packet from %v, they say their username is `%v`", conn.RemoteAddr().String(), username)
 
 	writer := outbound.NewAFCBW(conn, config.BufferFlushInterval)
+	defer writer.Close()
 
 	sendServerIdentificationErr := writer.SendServerIdentification(config.ServerName, config.ServerMOTD, false)
 	if sendServerIdentificationErr != nil {

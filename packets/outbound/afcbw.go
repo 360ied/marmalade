@@ -2,7 +2,9 @@ package outbound
 
 import (
 	"bufio"
+	"errors"
 	"io"
+	"log"
 	"sync"
 	"time"
 )
@@ -28,6 +30,12 @@ func NewAFCBW(writer io.Writer, interval time.Duration) *AFCBW {
 	return w
 }
 
+func (w *AFCBW) Close() {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+	w.err = errors.New("AFCBW: closed")
+}
+
 func (w *AFCBW) do(actions ...action) error {
 	w.lock.Lock()
 	defer w.lock.Unlock()
@@ -43,15 +51,20 @@ func (w *AFCBW) do(actions ...action) error {
 	return nil
 }
 
-func (w AFCBW) autoFlush() {
-	for {
+func (w *AFCBW) autoFlush() {
+	ok := true
+	for ok {
 		time.Sleep(w.interval)
 		func() {
 			w.lock.Lock()
 			defer w.lock.Unlock()
-			if err := w.writer.Flush(); err != nil {
+			if w.err != nil {
+				ok = false
+				log.Printf("INFO/ERROR: AFCBW error: %v", w.err)
+			} else if err := w.writer.Flush(); err != nil {
 				w.err = err
-				return
+				ok = false
+				log.Printf("INFO/ERROR: AFCBW flush error: %v", err)
 			}
 		}()
 	}
