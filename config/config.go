@@ -14,9 +14,11 @@ var (
 	WorldXSize          = mustAtoi(get("MM_WXSIZE", "256"))
 	WorldYSize          = mustAtoi(get("MM_WYSIZE", "128"))
 	WorldZSize          = mustAtoi(get("MM_WZSIZE", "256"))
-	SpawnPointX         = mustAtoi(get("MM_WSPX", "1"))
-	SpawnPointY         = mustAtoi(get("MM_WSPY", "1"))
-	SpawnPointZ         = mustAtoi(get("MM_WSPZ", "1"))
+	SpawnPointX         = uint16(mustAtoi(get("MM_WSP_X", "1")))
+	SpawnPointY         = uint16(mustAtoi(get("MM_WSP_Y", "1")))
+	SpawnPointZ         = uint16(mustAtoi(get("MM_WSP_Z", "1")))
+	SpawnPointYaw       = uint8(mustAtoi(get("MM_WSP_YAW", "0")))
+	SpawnPointPitch     = uint8(mustAtoi(get("MM_WSP_PITCH", "0")))
 )
 
 func get(key, fallback string) string {
