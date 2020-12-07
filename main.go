@@ -105,6 +105,12 @@ func handleConnection(conn net.Conn) {
 			}
 			world.HandleSetBlock(x, y, z, mode, blockType)
 		case 0x08: // position and orientation
+			x, y, z, yaw, pitch, packetErr := inbound.ReadPositionAndOrientation(reader)
+			if packetErr != nil {
+				log.Printf("ERROR: Failed to read position and orientation packet: %v", packetErr)
+				return
+			}
+			world.HandlePositionAndOrientation(p, x, y, z, yaw, pitch)
 		case 0x0d: // message
 		}
 	}

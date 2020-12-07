@@ -126,3 +126,20 @@ func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
 func position(x, y, z uint16) int {
 	return int(y)*config.WorldXSize*config.WorldZSize + int(z)*config.WorldXSize + int(x)
 }
+
+func HandlePositionAndOrientation(player *Player, x, y, z uint16, yaw, pitch uint8) {
+	PlayersMu.Lock()
+	defer PlayersMu.Unlock()
+
+	player.X = x
+	player.Y = y
+	player.Z = z
+	player.Yaw = yaw
+	player.Pitch = pitch
+
+	for _, v := range Players {
+		if v != nil {
+			go func() { _ = v.Writer.SendPositionAndOrientation(player.ID, x, y, z, yaw, pitch) }()
+		}
+	}
+}
