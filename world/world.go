@@ -109,11 +109,9 @@ func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
 		return
 	}
 	if mode == 0x00 {
-		Blocks.Set(pos, 0x00)
 		blockType = 0x00
-	} else {
-		Blocks.Set(pos, blockType)
 	}
+	Blocks.Set(pos, blockType)
 
 	PlayersMu.Lock()
 	defer PlayersMu.Unlock()
