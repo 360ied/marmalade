@@ -61,5 +61,6 @@ func handleConnection(conn net.Conn) {
 	sendServerIdentificationErr := writer.SendServerIdentification(config.ServerName, config.ServerMOTD, false)
 	if sendServerIdentificationErr != nil {
 		log.Printf("ERROR: Error sending server identification packet to %v, error: %v", conn.RemoteAddr().String(), sendServerIdentificationErr)
+		return
 	}
 }
