@@ -3,6 +3,7 @@ package world
 import (
 	"sync"
 
+	"marmalade/config"
 	"marmalade/packets/outbound"
 )
 
@@ -47,3 +48,8 @@ func RemovePlayer(id uint8) {
 	defer PlayersMu.Unlock()
 	Players[id] = nil
 }
+
+var (
+	World   = make([]byte, config.WorldXSize*config.WorldYSize*config.WorldZSize)
+	WorldMu = new(sync.RWMutex)
+)

@@ -11,6 +11,9 @@ var (
 	ServerName          = get("MM_SRVNM", "marmalade")
 	ServerMOTD          = get("MM_SRVMOTD", "placeholder MOTD, ask the server owner to set one!")
 	BufferFlushInterval = time.Second / time.Duration(mustAtoi(get("MM_TICKRATE", "20"))) // value to be passed into the AFCBW constructor
+	WorldXSize          = mustAtoi(get("MM_WXSIZE", "256"))
+	WorldYSize          = mustAtoi(get("MM_WYSIZE", "128"))
+	WorldZSize          = mustAtoi(get("MM_WZSIZE", "256"))
 )
 
 func get(key, fallback string) string {
