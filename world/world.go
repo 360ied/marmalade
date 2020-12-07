@@ -32,7 +32,7 @@ var (
 	Players   = [255]*Player{}
 	PlayersMu = new(sync.Mutex)
 
-	World = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
+	Blocks = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
 )
 
 // returns true if there is space to put another player
@@ -78,7 +78,7 @@ func SendWorld(w *outbound.AFCBW) error {
 	gzipW := gzip.NewWriter(bufW)
 
 	go func() {
-		snapshot := World.Snapshot()
+		snapshot := Blocks.Snapshot()
 		_ = binary.Write(gzipW, binary.BigEndian, uint32(len(snapshot)))
 		_, _ = gzipW.Write(snapshot)
 		defer func() { _ = gzipW.Close() }()
