@@ -30,3 +30,7 @@ func (c *ConcurrentSlice) Snapshot() []byte {
 	copy(snapshot, c.data)
 	return snapshot
 }
+
+func (c *ConcurrentSlice) Len() int {
+	return len(c.data)
+}

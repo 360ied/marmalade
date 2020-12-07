@@ -105,6 +105,9 @@ func SendWorld(w *outbound.AFCBW) error {
 
 func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
 	pos := position(x, y, z)
+	if pos >= Blocks.Len() || pos < 0 { // bounds check
+		return
+	}
 	if mode == 0x00 {
 		Blocks.Set(pos, 0x00)
 		blockType = 0x00
