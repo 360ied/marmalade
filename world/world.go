@@ -102,3 +102,27 @@ func SendWorld(w *outbound.AFCBW) error {
 
 	return w.SendLevelFinalize(uint16(config.WorldXSize), uint16(config.WorldYSize), uint16(config.WorldZSize))
 }
+
+func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
+	pos := position(x, y, z)
+	if mode != 0x00 {
+		Blocks.Set(pos, 0x00)
+		blockType = 0x00
+	} else {
+		Blocks.Set(pos, blockType)
+	}
+
+	PlayersMu.Lock()
+	defer PlayersMu.Unlock()
+
+	for _, v := range Players {
+		if v != nil {
+			go func() { _ = v.Writer.SendSetBlock(x, y, z, blockType) }()
+		}
+	}
+}
+
+// calculates the Blocks index from x, y, z
+func position(x, y, z uint16) int {
+	return int(y)*config.WorldXSize*config.WorldZSize + int(z)*config.WorldXSize + int(x)
+}

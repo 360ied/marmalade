@@ -90,12 +90,20 @@ func handleConnection(conn net.Conn) {
 		b, bErr := reader.ReadByte()
 		if bErr != nil {
 			log.Printf("ERROR: Failed to read packet id: %v", bErr)
+			return
 		}
 		if err := reader.UnreadByte(); err != nil {
 			log.Printf("ERROR: Failed to unread packet id: %v", err)
+			return
 		}
 		switch b {
 		case 0x05: // set block
+			x, y, z, mode, blockType, packetErr := inbound.ReadSetBlock(reader)
+			if packetErr != nil {
+				log.Printf("ERROR: Failed to read set block packet: %v", packetErr)
+				return
+			}
+			world.HandleSetBlock(x, y, z, mode, blockType)
 		case 0x08: // position and orientation
 		case 0x0d: // message
 		}
