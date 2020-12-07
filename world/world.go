@@ -48,5 +48,14 @@ func AddPlayer(player *Player) bool {
 func RemovePlayer(id uint8) {
 	PlayersMu.Lock()
 	defer PlayersMu.Unlock()
+
+	for _, v := range Players {
+		if v != nil {
+			go func() {
+				_ = v.Writer.SendDespawnPlayer(id)
+			}()
+		}
+	}
+
 	Players[id] = nil
 }
