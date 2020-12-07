@@ -29,7 +29,7 @@ type (
 )
 
 var (
-	Players   = [256]*Player{}
+	Players   = [255]*Player{}
 	PlayersMu = new(sync.Mutex)
 
 	World = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
