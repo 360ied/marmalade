@@ -3,7 +3,6 @@ package outbound
 import (
 	"bufio"
 	"encoding/binary"
-	"unsafe"
 )
 
 func writeByte(b byte) action {
@@ -14,7 +13,7 @@ func writeByte(b byte) action {
 
 func writeShort(s uint16) action {
 	return func(writer *bufio.Writer) error {
-		buf := make([]byte, unsafe.Sizeof(s))
+		buf := make([]byte, 2)
 		binary.BigEndian.PutUint16(buf, s)
 		_, err := writer.Write(buf)
 		return err
