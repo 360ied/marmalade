@@ -50,6 +50,5 @@ func RemovePlayer(id uint8) {
 }
 
 var (
-	World   = make([]byte, config.WorldXSize*config.WorldYSize*config.WorldZSize)
-	WorldMu = new(sync.RWMutex)
+	World = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
 )
