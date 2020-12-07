@@ -163,3 +163,14 @@ func SpawnOtherPlayers(newPlayer *Player) {
 		}
 	}
 }
+
+func BroadcastMessage(message string) {
+	PlayersMu.Lock()
+	defer PlayersMu.Unlock()
+	for _, v := range Players {
+		if v != nil {
+			v := v
+			go func() { _ = v.Writer.SendMessage(message) }()
+		}
+	}
+}

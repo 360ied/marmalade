@@ -115,6 +115,12 @@ func handleConnection(conn net.Conn) {
 			}
 			world.HandlePositionAndOrientation(p, x, y, z, yaw, pitch)
 		case 0x0d: // message
+			message, packetErr := inbound.ReadMessage(reader)
+			if packetErr != nil {
+				log.Printf("ERROR: Failed to read chat message: %v", packetErr)
+				return
+			}
+			world.BroadcastMessage(message)
 		}
 	}
 }
