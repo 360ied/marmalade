@@ -117,6 +117,7 @@ func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
 
 	for _, v := range Players {
 		if v != nil {
+			v := v
 			go func() { _ = v.Writer.SendSetBlock(x, y, z, blockType) }()
 		}
 	}
@@ -139,6 +140,7 @@ func HandlePositionAndOrientation(player *Player, x, y, z uint16, yaw, pitch uin
 
 	for _, v := range Players {
 		if v != nil {
+			v := v
 			go func() { _ = v.Writer.SendPositionAndOrientation(player.ID, x, y, z, yaw, pitch) }()
 		}
 	}
