@@ -55,6 +55,7 @@ func RemovePlayer(id uint8) {
 
 	for _, v := range Players {
 		if v != nil {
+			v := v // capture loop variable
 			go func() {
 				_ = v.Writer.SendDespawnPlayer(id)
 			}()
