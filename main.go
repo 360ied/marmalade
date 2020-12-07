@@ -9,6 +9,7 @@ import (
 	"marmalade/config"
 	"marmalade/packets/inbound"
 	"marmalade/packets/outbound"
+	"marmalade/world"
 )
 
 func main() {
@@ -63,4 +64,15 @@ func handleConnection(conn net.Conn) {
 		log.Printf("ERROR: Error sending server identification packet to %v, error: %v", conn.RemoteAddr().String(), sendServerIdentificationErr)
 		return
 	}
+
+	p := &world.Player{
+		Username: username,
+		OP:       false,
+		Writer:   writer,
+	}
+	if !world.AddPlayer(p) {
+		log.Printf("ERROR: Max players reached!")
+		return
+	}
+
 }

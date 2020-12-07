@@ -1,18 +1,20 @@
 package world
 
-import "marmalade/packets/outbound"
+import (
+	"sync"
+
+	"marmalade/packets/outbound"
+)
 
 type (
-	World struct {
-		blocks *ConcurrentSlice
-	}
-
 	Player struct {
 		Username string
 		Position
+
+		ID uint8
 		OP bool
 
-		writer *outbound.AFCBW
+		Writer *outbound.AFCBW
 	}
 
 	Position struct {
@@ -20,3 +22,28 @@ type (
 		Yaw, Pitch uint8
 	}
 )
+
+var (
+	Players   = [256]*Player{}
+	PlayersMu = new(sync.Mutex)
+)
+
+// returns true if there is space to put another player
+func AddPlayer(player *Player) bool {
+	PlayersMu.Lock()
+	defer PlayersMu.Unlock()
+	for i, v := range Players {
+		if v == nil {
+			Players[i] = player
+			player.ID = uint8(i)
+			return true
+		}
+	}
+	return false
+}
+
+func RemovePlayer(id uint8) {
+	PlayersMu.Lock()
+	defer PlayersMu.Unlock()
+	Players[id] = nil
+}
