@@ -11,9 +11,9 @@ var (
 	ServerName          = get("MM_SRVNM", "marmalade")
 	ServerMOTD          = get("MM_SRVMOTD", "placeholder MOTD, ask the server owner to set one!")
 	BufferFlushInterval = time.Second / time.Duration(mustAtoi(get("MM_TICKRATE", "20"))) // value to be passed into the AFCBW constructor
-	WorldXSize          = mustAtoi(get("MM_WXSIZE", "256"))
-	WorldYSize          = mustAtoi(get("MM_WYSIZE", "128"))
-	WorldZSize          = mustAtoi(get("MM_WZSIZE", "256"))
+	WorldXSize          = 32 * mustAtoi(get("MM_WXSIZE", "256"))
+	WorldYSize          = 32 * mustAtoi(get("MM_WYSIZE", "128"))
+	WorldZSize          = 32 * mustAtoi(get("MM_WZSIZE", "256"))
 	SpawnPointX         = uint16(mustAtoi(get("MM_WSP_X", "1")))
 	SpawnPointY         = uint16(mustAtoi(get("MM_WSP_Y", "1")))
 	SpawnPointZ         = uint16(mustAtoi(get("MM_WSP_Z", "1")))
