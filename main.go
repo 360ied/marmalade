@@ -82,7 +82,10 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
-	if err := writer.SendSpawnPlayer(255, username, 50*32, 20*32, 50*32, 0, 0); err != nil {
+	if err := writer.SendSpawnPlayer(
+		255, username,
+		uint16(config.SpawnPointX*32), uint16(config.SpawnPointY*32), uint16(config.SpawnPointZ*32),
+		0, 0); err != nil {
 		log.Printf("ERROR: Failed to send spawn player: %v", err)
 		return
 	}

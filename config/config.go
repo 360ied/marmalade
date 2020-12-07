@@ -14,6 +14,9 @@ var (
 	WorldXSize          = mustAtoi(get("MM_WXSIZE", "256"))
 	WorldYSize          = mustAtoi(get("MM_WYSIZE", "128"))
 	WorldZSize          = mustAtoi(get("MM_WZSIZE", "256"))
+	SpawnPointX         = mustAtoi(get("MM_WSPX", "1"))
+	SpawnPointY         = mustAtoi(get("MM_WSPY", "1"))
+	SpawnPointZ         = mustAtoi(get("MM_WSPZ", "1"))
 )
 
 func get(key, fallback string) string {
