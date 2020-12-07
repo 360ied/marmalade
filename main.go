@@ -80,4 +80,24 @@ func handleConnection(conn net.Conn) {
 		log.Printf("ERROR: Failed to send world: %v", err)
 		return
 	}
+
+	if err := writer.SendSpawnPlayer(255, username, 50*32, 20*32, 50*32, 0, 0); err != nil {
+		log.Printf("ERROR: Failed to send spawn player: %v", err)
+		return
+	}
+
+	for {
+		b, bErr := reader.ReadByte()
+		if bErr != nil {
+			log.Printf("ERROR: Failed to read packet id: %v", bErr)
+		}
+		if err := reader.UnreadByte(); err != nil {
+			log.Printf("ERROR: Failed to unread packet id: %v", err)
+		}
+		switch b {
+		case 0x05: // set block
+		case 0x08: // position and orientation
+		case 0x0d: // message
+		}
+	}
 }
