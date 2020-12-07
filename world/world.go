@@ -27,6 +27,8 @@ type (
 var (
 	Players   = [256]*Player{}
 	PlayersMu = new(sync.Mutex)
+
+	World = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
 )
 
 // returns true if there is space to put another player
@@ -48,7 +50,3 @@ func RemovePlayer(id uint8) {
 	defer PlayersMu.Unlock()
 	Players[id] = nil
 }
-
-var (
-	World = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
-)

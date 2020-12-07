@@ -74,5 +74,5 @@ func handleConnection(conn net.Conn) {
 		log.Printf("ERROR: Max players reached!")
 		return
 	}
-
+	defer world.RemovePlayer(p.ID)
 }
