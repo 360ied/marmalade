@@ -87,6 +87,8 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
+	world.SpawnOtherPlayers(p)
+
 	for {
 		b, bErr := reader.ReadByte()
 		if bErr != nil {

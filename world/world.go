@@ -145,3 +145,21 @@ func HandlePositionAndOrientation(player *Player, x, y, z uint16, yaw, pitch uin
 		}
 	}
 }
+
+func SpawnOtherPlayers(newPlayer *Player) {
+	PlayersMu.Lock()
+	defer PlayersMu.Unlock()
+
+	// send player other players
+	for _, v := range Players {
+		if v != nil && v.ID != newPlayer.ID {
+			v := v
+			// send player other players
+			go func() { _ = newPlayer.Writer.SendSpawnPlayer(v.ID, v.Username, v.X, v.Y, v.Z, v.Yaw, v.Pitch) }()
+			// send other players player
+			go func() {
+				_ = v.Writer.SendSpawnPlayer(newPlayer.ID, newPlayer.Username, newPlayer.X, newPlayer.Y, newPlayer.Z, newPlayer.Yaw, newPlayer.Pitch)
+			}()
+		}
+	}
+}
