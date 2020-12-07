@@ -120,7 +120,7 @@ func handleConnection(conn net.Conn) {
 				log.Printf("ERROR: Failed to read chat message: %v", packetErr)
 				return
 			}
-			world.BroadcastMessage(message)
+			world.BroadcastMessage(fmt.Sprintf("<%v> %v", p.Username, message))
 		}
 	}
 }
