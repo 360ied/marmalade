@@ -17,7 +17,7 @@ var (
 	SpawnPointX         = 32 * uint16(mustAtoi(get("MM_WSP_X", "1")))
 	SpawnPointY         = 32 * uint16(mustAtoi(get("MM_WSP_Y", "1")))
 	SpawnPointZ         = 32 * uint16(mustAtoi(get("MM_WSP_Z", "1")))
-	SpawnPointYaw       = uint8(mustAtoi(get("MM_WSP_YAW", "0")))
+	SpawnPointYaw       = uint8(mustAtoi(get("MM_WSP_YAW", "96"))) // southeast, looking away from 0, 0
 	SpawnPointPitch     = uint8(mustAtoi(get("MM_WSP_PITCH", "0")))
 )
 
