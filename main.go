@@ -75,6 +75,7 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 	defer world.RemovePlayer(p.ID)
+	log.Printf("INFO: Assigned `%v` player id %v", username, p.ID)
 
 	if err := world.SendWorld(writer); err != nil {
 		log.Printf("ERROR: Failed to send world: %v", err)
