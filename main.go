@@ -75,4 +75,9 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 	defer world.RemovePlayer(p.ID)
+
+	if err := world.SendWorld(writer); err != nil {
+		log.Printf("ERROR: Failed to send world: %v", err)
+		return
+	}
 }

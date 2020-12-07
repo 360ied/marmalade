@@ -1,6 +1,10 @@
 package world
 
 import (
+	"bufio"
+	"compress/gzip"
+	"encoding/binary"
+	"io"
 	"sync"
 
 	"marmalade/config"
@@ -58,4 +62,42 @@ func RemovePlayer(id uint8) {
 	}
 
 	Players[id] = nil
+}
+
+func SendWorld(w *outbound.AFCBW) error {
+	if err := w.SendLevelInitialize(); err != nil {
+		return err
+	}
+
+	pipeR, pipeW := io.Pipe()
+	defer func() { _ = pipeR.Close() }()
+	defer func() { _ = pipeW.Close() }()
+
+	bufW := bufio.NewWriter(pipeW)
+	gzipW := gzip.NewWriter(bufW)
+
+	go func() {
+		snapshot := World.Snapshot()
+		_ = binary.Write(gzipW, binary.BigEndian, uint32(len(snapshot)))
+		_, _ = gzipW.Write(snapshot)
+		defer func() { _ = gzipW.Close() }()
+		defer func() { _ = bufW.Flush() }()
+	}()
+
+	readBuf := make([]byte, 1024)
+	for {
+		n, err := pipeR.Read(readBuf)
+		if err != nil {
+			return err
+		}
+		if sErr := w.SendLevelDataChunk(uint16(n), readBuf, 50); sErr != nil {
+			return sErr
+		}
+
+		if n < len(readBuf) {
+			break
+		}
+	}
+
+	return w.SendLevelFinalize(uint16(config.WorldXSize), uint16(config.WorldYSize), uint16(config.WorldZSize))
 }

@@ -1,6 +1,7 @@
 package outbound
 
 import (
+	"bytes"
 	"strings"
 
 	"marmalade/helpers"
@@ -16,4 +17,8 @@ func opByte(b bool) byte {
 		return 64
 	}
 	return 0
+}
+
+func classicByteArray(b []byte) []byte {
+	return append(b, bytes.Repeat([]byte{0x00}, helpers.MaxInt(64-len(b), 0))...)[:1024]
 }
