@@ -82,8 +82,8 @@ func SendWorld(w *outbound.AFCBW) error {
 		Blocks.Snapshot(snapshot)
 		_ = binary.Write(gzipW, binary.BigEndian, uint32(len(snapshot)))
 		_, _ = gzipW.Write(snapshot)
-		defer func() { _ = gzipW.Close() }()
-		defer func() { _ = bufW.Flush() }()
+		_ = gzipW.Close()
+		_ = bufW.Flush()
 	}()
 
 	readBuf := make([]byte, 1024)
