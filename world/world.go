@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"marmalade/config"
+	"marmalade/helpers"
 	"marmalade/packets/outbound"
 )
 
@@ -173,28 +174,27 @@ func BroadcastMessage(message string) {
 	}
 }
 
-var BufferPool = sync.Pool{New: func() interface{} { return new(bytes.Buffer) }}
-
 func SendLargeMessage(player *Player, message string) error {
 	lines := strings.Split(message, "\n")
 
-	buf := BufferPool.Get().(*bytes.Buffer)
-	defer BufferPool.Put(buf)
+	buf := helpers.BufferPool.Get().(*bytes.Buffer)
+	defer helpers.BufferPool.Put(buf)
 	buf.Reset()
 
 	for _, v := range lines {
 		split := strings.Split(v, " ")
 		for _, vv := range split {
-			if buf.Len()+len(vv) > 64 {
-				// flush
-				if err := player.Writer.SendMessageBytes(buf.Bytes()); err != nil {
-					return err
+			for _, vvv := range helpers.PartitionString(vv, 63) { // 64 - len(' ') = 63
+				if buf.Len()+len(vvv) > 64 {
+					// flush
+					if err := player.Writer.SendMessageBytes(buf.Bytes()); err != nil {
+						return err
+					}
+					buf.Reset()
 				}
-				buf.Reset()
+				buf.WriteString(vvv)
+				buf.WriteByte(' ')
 			}
-			// note: part of the message will truncate if len(vv) > 63
-			buf.WriteString(vv)
-			buf.WriteByte(' ')
 		}
 	}
 	// flush rest
