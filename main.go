@@ -45,7 +45,7 @@ func handleConnection(conn net.Conn) {
 		if err := conn.Close(); err != nil {
 			log.Printf("ERROR: Failed to close TCP connection with %v", conn.RemoteAddr().String())
 		} else {
-			log.Printf("INFO: Sucessfully closed TCP connection with %v", conn.RemoteAddr().String())
+			log.Printf("INFO: Successfully closed TCP connection with %v", conn.RemoteAddr().String())
 		}
 	}()
 	log.Printf("INFO: %v has established a connection.", conn.RemoteAddr().String())
@@ -57,7 +57,7 @@ func handleConnection(conn net.Conn) {
 		log.Printf("ERROR: Error reading player identification packet from %v, error: %v", conn.RemoteAddr().String(), readPlayerIdentificationErr)
 		return
 	}
-	log.Printf("INFO: Recieved a player identification packet from %v, they say their username is `%v`", conn.RemoteAddr().String(), username)
+	log.Printf("INFO: Received a player identification packet from %v, they say their username is `%v`", conn.RemoteAddr().String(), username)
 
 	writer := outbound.NewAFCBW(conn, config.BufferFlushInterval)
 	defer writer.Close()
