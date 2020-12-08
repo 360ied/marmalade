@@ -186,17 +186,29 @@ func SendLargeMessage(player *Player, message string) error {
 		for _, vv := range split {
 			for _, vvv := range helpers.PartitionString(vv, 63) { // 64 - len(' ') = 63
 				if buf.Len()+len(vvv) > 64 {
-					// flush
-					if err := player.Writer.SendMessageBytes(buf.Bytes()); err != nil {
+					if err := msgBufFlush(player, buf); err != nil {
 						return err
 					}
 					buf.Reset()
 				}
 				buf.WriteString(vvv)
 			}
+			if buf.Len() > 63 {
+				if err := msgBufFlush(player, buf); err != nil {
+					return err
+				}
+			}
 			buf.WriteByte(' ')
 		}
 	}
 	// flush rest
 	return player.Writer.SendMessageBytes(buf.Bytes())
+}
+
+func msgBufFlush(player *Player, buf *bytes.Buffer) error {
+	if err := player.Writer.SendMessageBytes(buf.Bytes()); err != nil {
+		return err
+	}
+	buf.Reset()
+	return nil
 }
