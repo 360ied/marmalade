@@ -2,9 +2,11 @@ package world
 
 import (
 	"bufio"
+	"bytes"
 	"compress/gzip"
 	"encoding/binary"
 	"io"
+	"strings"
 	"sync"
 
 	"marmalade/config"
@@ -166,7 +168,35 @@ func BroadcastMessage(message string) {
 	defer PlayersMu.Unlock()
 	for _, v := range Players {
 		if v != nil {
-			_ = v.Writer.SendMessage(message)
+			_ = v.Writer.SendMessageStr(message)
 		}
 	}
+}
+
+var BufferPool = sync.Pool{New: func() interface{} { return new(bytes.Buffer) }}
+
+func SendLargeMessage(player *Player, message string) error {
+	lines := strings.Split(message, "\n")
+
+	buf := BufferPool.Get().(*bytes.Buffer)
+	defer BufferPool.Put(buf)
+	buf.Reset()
+
+	for _, v := range lines {
+		split := strings.Split(v, " ")
+		for _, vv := range split {
+			if buf.Len()+len(vv) > 64 {
+				// flush
+				if err := player.Writer.SendMessageBytes(buf.Bytes()); err != nil {
+					return err
+				}
+				buf.Reset()
+			}
+			// note: part of the message will truncate if len(vv) > 63
+			buf.WriteString(vv)
+			buf.WriteByte(' ')
+		}
+	}
+	// flush rest
+	return player.Writer.SendMessageBytes(buf.Bytes())
 }

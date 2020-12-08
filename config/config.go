@@ -20,6 +20,9 @@ var (
 	SpawnPointYaw       = uint8(mustAtoi(get("MM_WSP_YAW", "96"))) // southeast, looking away from 0, 0
 	SpawnPointPitch     = uint8(mustAtoi(get("MM_WSP_PITCH", "0")))
 	CommandPrefix       = get("MM_CMDPRFX", "/")
+	WelcomeMessage      = get("MM_WELCOMEMSG",
+		"marmalade is free and open source software licensed under the GNU Affero General Public License. "+
+			"The full source code can be found at https://github.com/360ied/marmalade")
 )
 
 func get(key, fallback string) string {

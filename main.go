@@ -100,6 +100,15 @@ func handleConnection(conn net.Conn) {
 
 	world.SpawnOtherPlayers(p)
 
+	// if err := p.Writer.SendMessageStr(config.WelcomeMessage); err != nil {
+	// 	log.Printf("ERROR: Failed to send welcome message: %v", err)
+	// 	return
+	// }
+	if err := world.SendLargeMessage(p, config.WelcomeMessage); err != nil {
+		log.Printf("ERROR: Failed to send welcome message: %v", err)
+		return
+	}
+
 	for {
 		b, bErr := reader.ReadByte()
 		if bErr != nil {

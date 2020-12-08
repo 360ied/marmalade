@@ -12,6 +12,11 @@ func classicString(s string) string {
 	return (s + strings.Repeat("\x20", helpers.MaxInt(64-len(s), 0)))[:64]
 }
 
+// pads a byte slice with spaces and trims it a length of 64
+func classicStrBytes(s []byte) []byte {
+	return append(s, bytes.Repeat([]byte{0x20}, helpers.MaxInt(64-len(s), 0))...)[:64]
+}
+
 func opByte(b bool) byte {
 	if b {
 		return 64

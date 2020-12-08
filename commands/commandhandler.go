@@ -16,19 +16,19 @@ func HandleCommand(player *world.Player, command string) {
 	split := strings.Split(command, " ")
 	fun, found := commandMap[split[0]]
 	if !found {
-		_ = player.Writer.SendMessage(fmt.Sprintf("[System] Unknown command `%v`", split[0]))
+		_ = player.Writer.SendMessageStr(fmt.Sprintf("[System] Unknown command `%v`", split[0]))
 		return
 	}
 	fun(player, split[1:])
 }
 
 func ping(player *world.Player, _ []string) {
-	_ = player.Writer.SendMessage("[System] Pong!")
+	_ = player.Writer.SendMessageStr("[System] Pong!")
 }
 
 func teleport(player *world.Player, args []string) {
 	if !player.OP {
-		_ = player.Writer.SendMessage("[System] You do not have the permissions to run this command.")
+		_ = player.Writer.SendMessageStr("[System] You do not have the permissions to run this command.")
 		return
 	}
 	switch len(args) {
@@ -47,8 +47,8 @@ func teleport(player *world.Player, args []string) {
 				return
 			}
 		}
-		_ = player.Writer.SendMessage("[System] Player not found!")
+		_ = player.Writer.SendMessageStr("[System] Player not found!")
 	default:
-		_ = player.Writer.SendMessage("[System] Invalid number of arguments.")
+		_ = player.Writer.SendMessageStr("[System] Invalid number of arguments.")
 	}
 }
