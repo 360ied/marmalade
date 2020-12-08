@@ -41,15 +41,11 @@ func teleport(player *world.Player, args []string) {
 		// find target player
 		for _, v := range world.Players {
 			if v != nil && strings.EqualFold(targetUsername, v.Username) {
-				player.Position = v.Position       // set player's position to new position
-				for _, vv := range world.Players { // send player positions
-					if vv != nil {
-						vv := vv
-						go func() {
-							_ = vv.Writer.SendPositionAndOrientation(player.ID, player.X, player.Y, player.Z, player.Yaw, player.Pitch)
-						}()
-					}
-				}
+				// set player's position to new position
+				player.Position = v.Position
+				// update player's position
+				// the player will broadcast this new position themselves, so no need to broadcast it for them
+				_ = player.Writer.SendPositionAndOrientation(255, player.X, player.Y, player.Z, player.Yaw, player.Pitch)
 				return
 			}
 		}
