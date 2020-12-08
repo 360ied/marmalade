@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
+	"marmalade/commands"
 	"marmalade/config"
 	"marmalade/packets/inbound"
 	"marmalade/packets/outbound"
@@ -127,7 +129,11 @@ func handleConnection(conn net.Conn) {
 				log.Printf("ERROR: Failed to read chat message: %v", packetErr)
 				return
 			}
-			world.BroadcastMessage(fmt.Sprintf("<%v> %v", p.Username, message))
+			if strings.HasPrefix(message, config.CommandPrefix) {
+				commands.HandleCommand(p, message[len(config.CommandPrefix):])
+			} else {
+				world.BroadcastMessage(fmt.Sprintf("<%v> %v", p.Username, message))
+			}
 		}
 	}
 }

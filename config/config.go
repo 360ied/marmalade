@@ -19,6 +19,7 @@ var (
 	SpawnPointZ         = 32 * uint16(mustAtoi(get("MM_WSP_Z", "1")))
 	SpawnPointYaw       = uint8(mustAtoi(get("MM_WSP_YAW", "96"))) // southeast, looking away from 0, 0
 	SpawnPointPitch     = uint8(mustAtoi(get("MM_WSP_PITCH", "0")))
+	CommandPrefix       = get("MM_CMDPRFX", "/")
 )
 
 func get(key, fallback string) string {
