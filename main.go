@@ -29,6 +29,7 @@ func main() {
 		}
 	}()
 	// Accept connections
+	log.Printf("INFO: Listening for connections on %v", config.Address)
 	for {
 		connection, connectionErr := listener.Accept()
 		if connectionErr != nil {
