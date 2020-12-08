@@ -193,8 +193,8 @@ func SendLargeMessage(player *Player, message string) error {
 					buf.Reset()
 				}
 				buf.WriteString(vvv)
-				buf.WriteByte(' ')
 			}
+			buf.WriteByte(' ')
 		}
 	}
 	// flush rest
