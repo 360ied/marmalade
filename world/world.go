@@ -62,6 +62,8 @@ func RemovePlayer(id uint8) {
 	Players[id] = nil
 }
 
+var snapshotBufferPool = sync.Pool{New: func() interface{} { return make([]byte, Blocks.Len()) }}
+
 func SendWorld(w *outbound.AFCBW) error {
 	if err := w.SendLevelInitialize(); err != nil {
 		return err
@@ -75,7 +77,9 @@ func SendWorld(w *outbound.AFCBW) error {
 	gzipW := gzip.NewWriter(bufW)
 
 	go func() {
-		snapshot := Blocks.Snapshot()
+		snapshot := snapshotBufferPool.Get().([]byte)
+		defer snapshotBufferPool.Put(snapshot)
+		Blocks.Snapshot(snapshot)
 		_ = binary.Write(gzipW, binary.BigEndian, uint32(len(snapshot)))
 		_, _ = gzipW.Write(snapshot)
 		defer func() { _ = gzipW.Close() }()

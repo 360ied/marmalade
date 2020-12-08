@@ -1,6 +1,8 @@
 package world
 
-import "sync"
+import (
+	"sync"
+)
 
 type ConcurrentSlice struct {
 	data []byte
@@ -23,12 +25,10 @@ func (c *ConcurrentSlice) Set(index int, value byte) {
 	c.data[index] = value
 }
 
-func (c *ConcurrentSlice) Snapshot() []byte {
+func (c *ConcurrentSlice) Snapshot(b []byte) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
-	snapshot := make([]byte, len(c.data))
-	copy(snapshot, c.data)
-	return snapshot
+	copy(b, c.data)
 }
 
 func (c *ConcurrentSlice) Len() int {
