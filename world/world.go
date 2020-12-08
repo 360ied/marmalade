@@ -55,10 +55,7 @@ func RemovePlayer(id uint8) {
 
 	for _, v := range Players {
 		if v != nil {
-			v := v // capture loop variable
-			go func() {
-				_ = v.Writer.SendDespawnPlayer(id)
-			}()
+			_ = v.Writer.SendDespawnPlayer(id)
 		}
 	}
 
@@ -118,8 +115,7 @@ func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
 
 	for _, v := range Players {
 		if v != nil {
-			v := v
-			go func() { _ = v.Writer.SendSetBlock(x, y, z, blockType) }()
+			_ = v.Writer.SendSetBlock(x, y, z, blockType)
 		}
 	}
 }
@@ -141,8 +137,7 @@ func HandlePositionAndOrientation(player *Player, x, y, z uint16, yaw, pitch uin
 
 	for _, v := range Players {
 		if v != nil {
-			v := v
-			go func() { _ = v.Writer.SendPositionAndOrientation(player.ID, x, y, z, yaw, pitch) }()
+			_ = v.Writer.SendPositionAndOrientation(player.ID, x, y, z, yaw, pitch)
 		}
 	}
 }
@@ -154,13 +149,10 @@ func SpawnOtherPlayers(newPlayer *Player) {
 	// send player other players
 	for _, v := range Players {
 		if v != nil && v.ID != newPlayer.ID {
-			v := v
 			// send player other players
-			go func() { _ = newPlayer.Writer.SendSpawnPlayer(v.ID, v.Username, v.X, v.Y, v.Z, v.Yaw, v.Pitch) }()
+			_ = newPlayer.Writer.SendSpawnPlayer(v.ID, v.Username, v.X, v.Y, v.Z, v.Yaw, v.Pitch)
 			// send other players player
-			go func() {
-				_ = v.Writer.SendSpawnPlayer(newPlayer.ID, newPlayer.Username, newPlayer.X, newPlayer.Y, newPlayer.Z, newPlayer.Yaw, newPlayer.Pitch)
-			}()
+			_ = v.Writer.SendSpawnPlayer(newPlayer.ID, newPlayer.Username, newPlayer.X, newPlayer.Y, newPlayer.Z, newPlayer.Yaw, newPlayer.Pitch)
 		}
 	}
 }
@@ -170,8 +162,7 @@ func BroadcastMessage(message string) {
 	defer PlayersMu.Unlock()
 	for _, v := range Players {
 		if v != nil {
-			v := v
-			go func() { _ = v.Writer.SendMessage(message) }()
+			_ = v.Writer.SendMessage(message)
 		}
 	}
 }
