@@ -55,10 +55,12 @@ func init() {
 	if worldFileErr != nil {
 		panic(worldFileErr)
 	}
+	defer func() { _ = worldFile.Close() }()
 	gzipR, gzipRErr := gzip.NewReader(worldFile)
 	if gzipRErr != nil {
 		panic(gzipRErr)
 	}
+	defer func() { _ = gzipR.Close() }()
 	bufR := bufio.NewReader(gzipR)
 
 	wNBT, _ /* wNBTName */, wNBTErr := nbt.Read(bufR)
