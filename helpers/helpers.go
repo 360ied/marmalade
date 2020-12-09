@@ -1,9 +1,12 @@
 package helpers
 
 import (
+	"bufio"
 	"bytes"
 	"sync"
 )
+
+type Action = func(*bufio.Writer) error
 
 var (
 	bufferPool = sync.Pool{New: func() interface{} { return new(bytes.Buffer) }}

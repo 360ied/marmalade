@@ -167,114 +167,134 @@ func readName(reader *bufio.Reader) (string, error) {
 	return buf.String(), nil
 }
 
-func WriteEnd(writer *bufio.Writer) error {
-	return writer.WriteByte(tagEnd)
+func WriteEnd() helpers.Action {
+	return func(writer *bufio.Writer) error {
+		return writer.WriteByte(tagEnd)
+	}
 }
 
-func WriteByte(writer *bufio.Writer, name string, b byte) error {
-	if err := writer.WriteByte(tagByte); err != nil {
-		return err
+func WriteByte(name string, b byte) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagByte); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		return writer.WriteByte(b)
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	return writer.WriteByte(b)
 }
 
-func WriteShort(writer *bufio.Writer, name string, s uint16) error {
-	if err := writer.WriteByte(tagShort); err != nil {
+func WriteShort(name string, s uint16) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagShort); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		bs := [unsafe.Sizeof(s)]byte{}
+		binary.BigEndian.PutUint16(bs[:], s)
+		_, err := writer.Write(bs[:])
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	bs := [unsafe.Sizeof(s)]byte{}
-	binary.BigEndian.PutUint16(bs[:], s)
-	_, err := writer.Write(bs[:])
-	return err
 }
 
-func WriteInt(writer *bufio.Writer, name string, i uint32) error {
-	if err := writer.WriteByte(tagInt); err != nil {
+func WriteInt(name string, i uint32) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagInt); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		bs := [unsafe.Sizeof(i)]byte{}
+		binary.BigEndian.PutUint32(bs[:], i)
+		_, err := writer.Write(bs[:])
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	bs := [unsafe.Sizeof(i)]byte{}
-	binary.BigEndian.PutUint32(bs[:], i)
-	_, err := writer.Write(bs[:])
-	return err
 }
 
-func WriteLong(writer *bufio.Writer, name string, l uint64) error {
-	if err := writer.WriteByte(tagLong); err != nil {
+func WriteLong(name string, l uint64) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagLong); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		bs := [unsafe.Sizeof(l)]byte{}
+		binary.BigEndian.PutUint64(bs[:], l)
+		_, err := writer.Write(bs[:])
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	bs := [unsafe.Sizeof(l)]byte{}
-	binary.BigEndian.PutUint64(bs[:], l)
-	_, err := writer.Write(bs[:])
-	return err
 }
 
-func WriteFloat(writer *bufio.Writer, name string, f float32) error {
-	if err := writer.WriteByte(tagFloat); err != nil {
+func WriteFloat(name string, f float32) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagFloat); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		bs := [unsafe.Sizeof(uint32(0))]byte{}
+		binary.BigEndian.PutUint32(bs[:], math.Float32bits(f))
+		_, err := writer.Write(bs[:])
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	bs := [unsafe.Sizeof(uint32(0))]byte{}
-	binary.BigEndian.PutUint32(bs[:], math.Float32bits(f))
-	_, err := writer.Write(bs[:])
-	return err
 }
 
-func WriteDouble(writer *bufio.Writer, name string, d float64) error {
-	if err := writer.WriteByte(tagDouble); err != nil {
+func WriteDouble(name string, d float64) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagDouble); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		bs := [unsafe.Sizeof(uint64(0))]byte{}
+		binary.BigEndian.PutUint64(bs[:], math.Float64bits(d))
+		_, err := writer.Write(bs[:])
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	bs := [unsafe.Sizeof(uint64(0))]byte{}
-	binary.BigEndian.PutUint64(bs[:], math.Float64bits(d))
-	_, err := writer.Write(bs[:])
-	return err
 }
 
-func WriteByteArray(writer *bufio.Writer, name string, b []byte) error {
-	if err := writer.WriteByte(tagByteArray); err != nil {
+func WriteByteArray(name string, b []byte) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagByteArray); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		_, err := writer.Write(b)
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	_, err := writer.Write(b)
-	return err
 }
 
-func WriteString(writer *bufio.Writer, name, s string) error {
-	if err := writer.WriteByte(tagString); err != nil {
+func WriteString(name, s string) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagString); err != nil {
+			return err
+		}
+		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		_, err := writer.WriteString(s)
 		return err
 	}
-	if err := writeName(writer, name); err != nil {
-		return err
-	}
-	_, err := writer.WriteString(s)
-	return err
 }
 
 // func WriteList
 
-func WriteCompound(writer *bufio.Writer, name string) error {
-	if err := writer.WriteByte(tagCompound); err != nil {
-		return err
+func WriteCompound(name string) helpers.Action {
+	return func(writer *bufio.Writer) error {
+		if err := writer.WriteByte(tagCompound); err != nil {
+			return err
+		}
+		return writeName(writer, name)
 	}
-	return writeName(writer, name)
 }
 
 // func WriteIntArray
