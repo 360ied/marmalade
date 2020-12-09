@@ -167,6 +167,16 @@ func readName(reader *bufio.Reader) (string, error) {
 	return buf.String(), nil
 }
 
+// Helper method for easier error handling
+func DoWrite(writer *bufio.Writer, actions ...helpers.Action) error {
+	for _, v := range actions {
+		if err := v(writer); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func WriteEnd() helpers.Action {
 	return func(writer *bufio.Writer) error {
 		return writer.WriteByte(tagEnd)
