@@ -109,6 +109,9 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
+	world.BroadcastMessage(fmt.Sprintf("[System] Joined: %v", p.Username))
+	defer world.BroadcastMessage(fmt.Sprintf("[System] Left: %v", p.Username))
+
 	for {
 		b, bErr := reader.ReadByte()
 		if bErr != nil {
