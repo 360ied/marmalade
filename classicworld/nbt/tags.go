@@ -3,7 +3,6 @@ package nbt
 import (
 	"bufio"
 	"encoding/binary"
-	"fmt"
 	"math"
 	"unsafe"
 
@@ -51,12 +50,10 @@ func readCompound(reader *bufio.Reader, out Compound) error {
 		if b == tagEnd { // `tagEnd`s don't have names
 			return nil
 		}
-		fmt.Println("b", b)
 		name, nameErr := readName(reader)
 		if nameErr != nil {
 			return nameErr
 		}
-		fmt.Println("name", name)
 		switch b {
 		case tagByte:
 			read, err := reader.ReadByte()

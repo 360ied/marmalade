@@ -6,9 +6,12 @@ import (
 	"compress/gzip"
 	"encoding/binary"
 	"io"
+	"log"
+	"os"
 	"strings"
 	"sync"
 
+	"marmalade/classicworld/nbt"
 	"marmalade/config"
 	"marmalade/helpers"
 	"marmalade/packets/outbound"
@@ -35,8 +38,52 @@ var (
 	Players   = [255]*Player{}
 	PlayersMu = new(sync.Mutex)
 
-	Blocks = NewConcurrentSlice(config.WorldXSize * config.WorldYSize * config.WorldZSize)
+	Blocks *ConcurrentSlice
+
+	// Name string
+	// UUID []byte
+
+	XSize uint16
+	YSize uint16
+	ZSize uint16
+
+	SpawnPos Position
 )
+
+func init() {
+	worldFile, worldFileErr := os.Open(config.WorldPath)
+	if worldFileErr != nil {
+		panic(worldFileErr)
+	}
+	gzipR, gzipRErr := gzip.NewReader(worldFile)
+	if gzipRErr != nil {
+		panic(gzipRErr)
+	}
+	bufR := bufio.NewReader(gzipR)
+
+	wNBT, _ /* wNBTName */, wNBTErr := nbt.Read(bufR)
+	if wNBTErr != nil {
+		panic(wNBTErr)
+	}
+
+	// Name = wNBT["Name"].(string)
+	// UUID = wNBT["UUID"].([]byte)
+
+	XSize = wNBT["X"].(uint16)
+	YSize = wNBT["Y"].(uint16)
+	ZSize = wNBT["Z"].(uint16)
+
+	spawnNBT := wNBT["Spawn"].(nbt.Compound)
+	SpawnPos.X = spawnNBT["X"].(uint16)
+	SpawnPos.Y = spawnNBT["Y"].(uint16)
+	SpawnPos.Z = spawnNBT["Z"].(uint16)
+	SpawnPos.Yaw = spawnNBT["H"].(uint8) // Heading is another name for yaw
+	SpawnPos.Pitch = spawnNBT["P"].(uint8)
+
+	Blocks = NewConcurrentSlice(wNBT["BlockArray"].([]byte))
+
+	log.Printf("[INFO] Loaded map %v", config.WorldPath)
+}
 
 // returns true if there is space to put another player
 func AddPlayer(player *Player) bool {
@@ -104,7 +151,7 @@ func SendWorld(w *outbound.AFCBW) error {
 		}
 	}
 
-	return w.SendLevelFinalize(uint16(config.WorldXSize), uint16(config.WorldYSize), uint16(config.WorldZSize))
+	return w.SendLevelFinalize(XSize, YSize, ZSize)
 }
 
 func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
@@ -129,7 +176,7 @@ func HandleSetBlock(x, y, z uint16, mode, blockType byte) {
 
 // calculates the Blocks index from x, y, z
 func position(x, y, z uint16) int {
-	return int(y)*config.WorldXSize*config.WorldZSize + int(z)*config.WorldXSize + int(x)
+	return int(y)*int(XSize)*int(ZSize) + int(z)*int(XSize) + int(x)
 }
 
 func HandlePositionAndOrientation(player *Player, x, y, z uint16, yaw, pitch uint8) {

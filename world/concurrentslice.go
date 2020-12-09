@@ -9,8 +9,8 @@ type ConcurrentSlice struct {
 	lock *sync.RWMutex
 }
 
-func NewConcurrentSlice(size int) *ConcurrentSlice {
-	return &ConcurrentSlice{make([]byte, size), new(sync.RWMutex)}
+func NewConcurrentSlice(b []byte) *ConcurrentSlice {
+	return &ConcurrentSlice{b, new(sync.RWMutex)}
 }
 
 func (c *ConcurrentSlice) Get(index int) byte {
