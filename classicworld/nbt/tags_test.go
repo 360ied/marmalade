@@ -48,3 +48,12 @@ func TestReadWorld(t *testing.T) {
 	fmt.Println(c)
 	fmt.Println(name)
 }
+
+func BenchmarkWriteName(b *testing.B) {
+	buf := new(bytes.Buffer)
+	writer := bufio.NewWriter(buf)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = writeName(writer, "adoignotarihnraoihnarohnroe")
+	}
+}
