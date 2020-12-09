@@ -177,8 +177,8 @@ func BroadcastMessage(message string) {
 func SendLargeMessage(player *Player, message string) error {
 	lines := strings.Split(message, "\n")
 
-	buf := helpers.BufferPool.Get().(*bytes.Buffer)
-	defer helpers.BufferPool.Put(buf)
+	buf := helpers.GetBuffer()
+	defer helpers.PutBuffer(buf)
 	buf.Reset()
 
 	for _, v := range lines {
