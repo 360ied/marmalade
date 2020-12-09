@@ -13,9 +13,9 @@ func writeByte(b byte) action {
 
 func writeShort(s uint16) action {
 	return func(writer *bufio.Writer) error {
-		buf := make([]byte, 2)
-		binary.BigEndian.PutUint16(buf, s)
-		_, err := writer.Write(buf)
+		buf := [2]byte{}
+		binary.BigEndian.PutUint16(buf[:], s)
+		_, err := writer.Write(buf[:])
 		return err
 	}
 }
