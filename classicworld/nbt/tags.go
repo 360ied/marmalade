@@ -278,6 +278,9 @@ func WriteByteArray(name string, b []byte) helpers.Action {
 		if err := writeName(writer, name); err != nil {
 			return err
 		}
+		if err := binary.Write(writer, binary.BigEndian, uint32(len(b))); err != nil {
+			return err
+		}
 		_, err := writer.Write(b)
 		return err
 	}
@@ -289,6 +292,9 @@ func WriteString(name, s string) helpers.Action {
 			return err
 		}
 		if err := writeName(writer, name); err != nil {
+			return err
+		}
+		if err := binary.Write(writer, binary.BigEndian, uint16(len(s))); err != nil {
 			return err
 		}
 		_, err := writer.WriteString(s)

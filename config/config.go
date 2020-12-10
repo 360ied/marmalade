@@ -11,7 +11,10 @@ var (
 	ServerName          = get("MM_SRVNM", "marmalade")
 	ServerMOTD          = get("MM_SRVMOTD", "placeholder MOTD, ask the server owner to set one!")
 	BufferFlushInterval = time.Second / time.Duration(mustAtoi(get("MM_TICKRATE", "20"))) // value to be passed into the AFCBW constructor
-	WorldPath           = get("MM_WPATH", "world.cw")
+	WorldPath           = get("MM_WPATH", "world.ucw")                                    // uncompressed classic world
+	WorldScratchPath    = get("MM_WSPATH", WorldPath+"2")
+	WorldTempPath       = get("MM_WTMPRNPATH", WorldPath+"_TMP")
+	WorldSaveDelay      = time.Second * time.Duration(mustAtoi(get("MM_WSAVEDELAY", "30")))
 	CommandPrefix       = get("MM_CMDPRFX", "/")
 	WelcomeMessage      = get("MM_WELCOMEMSG",
 		"marmalade is free and open source software licensed under the GNU Affero General Public License. "+

@@ -15,6 +15,8 @@ import (
 )
 
 func main() {
+	// Initialize world
+	world.Initialize()
 	// Create new listener
 	listener, listenerErr := net.Listen("tcp", config.Address)
 	if listenerErr != nil {

@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"marmalade/classicworld/nbt"
 	"marmalade/config"
@@ -50,18 +51,18 @@ var (
 	SpawnPos Position
 )
 
-func init() {
+func Initialize() {
 	worldFile, worldFileErr := os.Open(config.WorldPath)
 	if worldFileErr != nil {
 		panic(worldFileErr)
 	}
 	defer func() { _ = worldFile.Close() }()
-	gzipR, gzipRErr := gzip.NewReader(worldFile)
-	if gzipRErr != nil {
-		panic(gzipRErr)
-	}
-	defer func() { _ = gzipR.Close() }()
-	bufR := bufio.NewReader(gzipR)
+	// gzipR, gzipRErr := gzip.NewReader(worldFile)
+	// if gzipRErr != nil {
+	// 	panic(gzipRErr)
+	// }
+	// defer func() { _ = gzipR.Close() }()
+	bufR := bufio.NewReader(worldFile)
 
 	wNBT, _ /* wNBTName */, wNBTErr := nbt.Read(bufR)
 	if wNBTErr != nil {
@@ -85,6 +86,79 @@ func init() {
 	Blocks = NewConcurrentSlice(wNBT["BlockArray"].([]byte))
 
 	log.Printf("[INFO] Loaded map %v", config.WorldPath)
+
+	go func() {
+		for {
+			time.Sleep(config.WorldSaveDelay)
+			if err := save(); err != nil {
+				log.Printf("[ERROR] Failed to save world: %v", err)
+			} else {
+				log.Print("[INFO] Successfully saved world.")
+			}
+		}
+	}()
+}
+
+func save() error {
+	// Write-only, because we're not going to read or append anything
+	// Create, because we want to create a new file if it didn't previously exist
+	worldScFile, worldScFileErr := os.OpenFile(config.WorldScratchPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	if worldScFileErr != nil {
+		return worldScFileErr
+	}
+	defer func() { _ = worldScFile.Close() }()
+	// buf0 := bufio.NewWriter(worldScFile)
+	// gzipW := gzip.NewWriter(buf0) // compression unexpected eof for some reason
+	bufW := bufio.NewWriter(worldScFile)
+
+	snapshot := snapshotBufferPool.Get().([]byte)
+	Blocks.Snapshot(snapshot)
+
+	if err := nbt.DoWrite(bufW,
+		nbt.WriteCompound("ClassicWorld"),
+		nbt.WriteShort("X", XSize),
+		nbt.WriteShort("Y", YSize),
+		nbt.WriteShort("Z", ZSize),
+		nbt.WriteCompound("Spawn"),
+		nbt.WriteShort("X", SpawnPos.X),
+		nbt.WriteShort("Y", SpawnPos.Y),
+		nbt.WriteShort("Z", SpawnPos.Z),
+		nbt.WriteByte("H", SpawnPos.Yaw),
+		nbt.WriteByte("P", SpawnPos.Pitch),
+		nbt.WriteEnd(), // Spawn
+		nbt.WriteByteArray("BlockArray", snapshot),
+		nbt.WriteCompound("Metadata"),
+		nbt.WriteString("Made_With", "marmalade"),
+		nbt.WriteEnd(), // Metadata
+		nbt.WriteEnd(), // ClassicWorld
+	); err != nil {
+		return err
+	}
+
+	// Close writers before renaming the files
+	// if err := buf0.Flush(); err != nil {
+	// 	return err
+	// }
+	// if err := gzipW.Close(); err != nil {
+	// 	return err
+	// }
+	if err := bufW.Flush(); err != nil {
+		return err
+	}
+	if err := worldScFile.Close(); err != nil {
+		return err
+	}
+
+	// First rename WorldPath to WorldTempPath instead of deletion in case renaming WorldScratchPath to WorldPath fails
+	if err := os.Rename(config.WorldPath, config.WorldTempPath); err != nil {
+		return err
+	}
+	if err := os.Rename(config.WorldScratchPath, config.WorldPath); err != nil {
+		return err
+	}
+
+	// Now we can safely delete the old world
+	return os.Remove(config.WorldTempPath)
 }
 
 // returns true if there is space to put another player
