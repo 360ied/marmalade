@@ -59,6 +59,7 @@ func teleport(player *world.Player, args []string) {
 func fill(player *world.Player, args []string) {
 	if len(args) != 7 {
 		_ = player.Writer.SendMessageStr("[System] Too many or too few arguments! 7 required.")
+		return
 	}
 
 	// Decode arguments
