@@ -100,7 +100,7 @@ func fill(player *world.Player, args []string) {
 
 	for x := lesserX; x <= greaterX; x++ {
 		for y := lesserY; y <= greaterY; y++ {
-			for z := lesserZ; z < greaterZ; z++ {
+			for z := lesserZ; z <= greaterZ; z++ {
 				world.HandleSetBlock(uint16(x), uint16(y), uint16(z), 1, byte(block))
 			}
 		}
