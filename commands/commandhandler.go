@@ -98,6 +98,11 @@ func fill(player *world.Player, args []string) {
 		return
 	}
 
+	if lesserX < 0 || lesserY < 0 || lesserZ < 0 || greaterX >= int(world.XSize) || greaterY >= int(world.YSize) || greaterZ >= int(world.ZSize) {
+		_ = world.SendLargeMessage(player, "[System] Out of bounds coordinate!")
+		return
+	}
+
 	for x := lesserX; x <= greaterX; x++ {
 		for y := lesserY; y <= greaterY; y++ {
 			for z := lesserZ; z <= greaterZ; z++ {
