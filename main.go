@@ -150,6 +150,9 @@ func handleConnection(conn net.Conn) {
 			} else {
 				world.BroadcastMessage(fmt.Sprintf("<%v> %v", p.Username, message))
 			}
+		default:
+			log.Printf("ERROR: Invalid packet ID: %v", b)
+			return
 		}
 	}
 }
